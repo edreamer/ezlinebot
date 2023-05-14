@@ -1,4 +1,5 @@
 from flask import Flask, request, abort
+import openai, os
 
 from linebot import (
     LineBotApi, WebhookHandler
@@ -9,13 +10,13 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
-import openai
-openai.api_key = "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"
+
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 app = Flask(__name__)
 
-line_bot_api = LineBotApi('srFTsHK62OAvxrtPQxwkyYdXrS0ICYgrSgKarEpd5ayHlSMPY2TEP1KNbDMUm5bx4cDb7610wTfayRUG+ZXOkPrPt6zwIP5VrmGLJnqSvioWwxVL7m4g9Vr9OqNcr1ucsS2fxqWFCsajmWxfN32mTgdB04t89/1O/w1cDnyilFU=')
-handler1 = WebhookHandler('3422ef0232368541bcf7867e2f7f8443')
+line_bot_api = LineBotApi(os.getenv('LINE_ACCESS_TOKEN'))
+handler1 = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET'))
 
 def askchatgpt(q):
     response = openai.Completion.create(

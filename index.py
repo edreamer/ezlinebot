@@ -15,8 +15,8 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 
 app = Flask(__name__)
 
-line_bot_api = LineBotApi(os.getenv('LINE_ACCESS_TOKEN'))
-handler1 = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET'))
+line_bot_api = LineBotApi('srFTsHK62OAvxrtPQxwkyYdXrS0ICYgrSgKarEpd5ayHlSMPY2TEP1KNbDMUm5bx4cDb7610wTfayRUG+ZXOkPrPt6zwIP5VrmGLJnqSvioWwxVL7m4g9Vr9OqNcr1ucsS2fxqWFCsajmWxfN32mTgdB04t89/1O/w1cDnyilFU=')
+handler = WebhookHandler('3422ef0232368541bcf7867e2f7f8443')
 
 def askchatgpt(q):
     response = openai.Completion.create(

@@ -11,7 +11,7 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
 
-openai.api_key = os.getenv('OPENAI_API_KEY')
+openai.api_key = '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'
 
 app = Flask(__name__)
 

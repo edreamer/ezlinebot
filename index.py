@@ -10,10 +10,13 @@ app = Flask(__name__)
 
 def askchatgpt(q):
     response = openai.Completion.create(
-        model="gpt-3.5-turbo",
-        prompt=q,
-        temperature=0.5,
-        max_tokens=1024
+        model="text-davinci-003",
+        prompt="",
+        temperature=1,
+        max_tokens=1024,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0        
     )
     return response['choices'][0]['text'].strip()
 

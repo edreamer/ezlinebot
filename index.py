@@ -1,5 +1,4 @@
 from flask import Flask, request, abort
-from flask_ngrok import run_with_ngrok
 
 from linebot import (
     LineBotApi, WebhookHandler
@@ -31,7 +30,6 @@ def askchatgpt(q):
     return datas['choices'][0]['text'].strip()
 
 app = Flask(__name__)
-run_with_ngrok(app)
 
 line_bot_api = LineBotApi(os.getenv('LINE_ACCESS_TOKEN'))
 handler = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET'))

@@ -1,42 +1,67 @@
 from flask import Flask, request, abort
-import os
-from linebot import  LineBotApi, WebhookHandler
-from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
-import openai
-openai.api_key = os.getenv('OPENAI_API_KEY')
+from flask_ngrok import run_with_ngrok
 
-app = Flask(__name__)
+from linebot import (
+    LineBotApi, WebhookHandler
+)
+from linebot.exceptions import (
+    InvalidSignatureError
+)
+from linebot.models import (
+    MessageEvent, TextMessage, TextSendMessage,
+)
+
+import requests, os
+url = "https://api.openai.com/v1/completions"
+api_key = os.getenv('OPENAI_API_KEY')
+headers = {"Authorization":"Bearer " + api_key}
 
 def askchatgpt(q):
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt="",
-        temperature=1,
-        max_tokens=1024,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0        
-    )
-    return response['choices'][0]['text'].strip()
+    data = {
+    "model": "text-davinci-003",
+    "prompt": q,
+    "temperature": 1,
+    "max_tokens": 1024,
+    "top_p": 1,
+    "frequency_penalty": 0,
+    "presence_penalty": 0
+    }
+    r = requests.post(url, json=data, headers=headers)
+    datas = r.json()
+    return datas['choices'][0]['text'].strip()
+
+app = Flask(__name__)
+run_with_ngrok(app)
 
 line_bot_api = LineBotApi(os.getenv('LINE_ACCESS_TOKEN'))
-handler1 = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET'))
+handler = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET'))
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
+    # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
+
+    # get request body as text
     body = request.get_data(as_text=True)
+    app.logger.info("Request body: " + body)
+
+    # handle webhook body
     try:
-        handler1.handle(body, signature)
+        handler.handle(body, signature)
     except InvalidSignatureError:
         print("Invalid signature. Please check your channel access token/channel secret.")
         abort(400)
+
     return 'OK'
 
-@handler1.add(MessageEvent, message=TextMessage)
+
+@handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=askchatgpt(event.message.text)))
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=askchatgpt(event.message.text)))
+
 
 if __name__ == "__main__":
     app.run()

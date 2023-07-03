@@ -2,18 +2,19 @@ from flask import Flask, request, abort
 from linebot import  LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
-import openai
+import openai,os
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 app = Flask(__name__)
 
 def askchatgpt(q):
-    return openai.Completion.create(
+    r = openai.Completion.create(
         model="text-davinci-003",
         prompt=q,
         max_tokens=1024,
         temperature=1
-        )["choices"][0]["text"]
+        )
+    return r["choices"][0]["text"]
 
 line_bot_api = LineBotApi(os.getenv('LINE_ACCESS_TOKEN'))
 handler1 = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET'))
